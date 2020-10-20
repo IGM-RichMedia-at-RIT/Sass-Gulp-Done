@@ -1,0 +1,32 @@
+/* This file defines our SCSS, or Sass CSS. Sass (https://sass-lang.com/)
+   is a superset of css, which allows us to write things in a much nicer
+   syntax than we would be used to with standard css.
+
+   Since we still need to use it in the browser, we will have to build it
+   to valid CSS using the node-sass or gulp-sass plugins. This particular
+   file has already been built to /hosted/main.css
+*/
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0; }
+
+#app {
+  width: 50%;
+  margin: 0 auto;
+  text-align: center; }
+  #app div {
+    margin-top: 100px; }
+    #app div h1 {
+      color: cornflowerblue; }
+    #app div h2 i {
+      color: cornflowerblue; }
+    #app div ul {
+      width: 400px;
+      margin: 0 auto;
+      text-align: left; }
+      #app div ul li {
+        margin-top: 10px;
+        word-break: break-all;
+        font-size: 1.1em; }

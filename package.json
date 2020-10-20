@@ -1,0 +1,52 @@
+{
+  "name": "Sass-Gulp",
+  "version": "1.1.0",
+  "engines": {
+    "node": "10.16.0",
+    "npm": "6.9.0"
+  },
+  "description": "A Simple Example using React apps",
+  "main": "./server/app.js",
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "buildSass": "node-sass --include-path scss ./scss/main.scss ./hosted/main.css",
+    "watchSass": "node-sass --watch --include-path scss ./scss/main.scss ./hosted/main.css",
+    "nodemon": "nodemon --watch ./server ./server/app.js ",
+    "start": "node ./server/app.js",
+    "pretest": "eslint ./server --fix",
+    "test": "echo \"Tests complete\""
+  },
+  "author": "Cody Van De Mark / Austin Willoughby",
+  "license": "Apache 2.0",
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-env": "^7.12.1",
+    "@babel/preset-react": "^7.12.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "^2.22.1",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-cached": "^1.1.1",
+    "gulp-eslint": "^6.0.0",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-sass": "^4.1.0",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "connect-redis": "^5.0.0",
+    "cookie-parser": "^1.4.5",
+    "csurf": "^1.11.0",
+    "express": "^4.17.1",
+    "express-handlebars": "^5.1.0",
+    "express-session": "^1.17.1",
+    "mongoose": "^5.10.9",
+    "serve-favicon": "^2.5.0",
+    "underscore": "^1.11.0"
+  }
+}
