@@ -1,28 +1,20 @@
-const handleNameChange = (e) => {
-  ReactDOM.render(
-    <HelloUser username={e.target.value} />,
-    document.getElementById('app')
-  );
-};
+//JSX to be built by webpack. See React Functional Component demo.
 
 const HelloUser = (props) => {
-  //onChange is a custom react listener for element.onchange. 
-  //We can embed it in elements, but it doesn't get rendered into the HTML
-  //Instead it gets interpreted by JSX and adds a listener 
+  const [username, setUsername] = React.useState(props.username);
+
   return (
     <div>
-      Hello {props.username}
-      <p>Change Name:</p>
-      <input type="text" value={props.username} onChange={handleNameChange} />
+      <p>Hello {username}</p>
+      <label>Change Name: </label>
+      <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
     </div>
   )
-};
+}
 
 const init = () => {
-  ReactDOM.render(
-    <HelloUser username='Cody' />,
-    document.getElementById('app')
-  );
+  ReactDOM.render( <HelloUser username='Austin' />,
+    document.getElementById('app'));
 };
 
 window.onload = init;

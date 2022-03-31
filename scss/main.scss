@@ -1,25 +1,46 @@
-/* This file defines our SCSS, or Sass CSS. Sass (https://sass-lang.com/)
-   is a superset of css, which allows us to write things in a much nicer
-   syntax than we would be used to with standard css.
+/*This file is written with "Sass", a superset language of css
+  that adds / extends the base css functionality. It will not
+  run in the browser, so it will need to be compiled to raw css.
+  That means sass cannot do *more* than css, but it does make it
+  easier to write css with sass.
+  https://sass-lang.com/
 
-   Since we still need to use it in the browser, we will have to build it
-   to valid CSS using the node-sass or gulp-sass plugins. This particular
-   file has already been built to /hosted/main.css
+  This scss file serves as our main scss entry point. Similar
+  to how webpack can compile our client side javascript into a
+  single file, dart-sass can compile our scss into a single file
+  (or multiple files if configured).
 */
 
+/*One nice feature of sass is the ability to import other files
+  similar to how we would import javascript modules. Although we
+  cannot reference variables defined in other files, we can use
+  the @use syntax to combine multiple css files together into one
+  bundle. In this case, we are importing the contents of other.scss
+  into this file.
+*/ 
+@use 'other';
 
-// Here we are defining two variables to store some style information
+/*With sass we can also define variables like the two below. We can
+  then use these variables in place of where we might use their values.
+  For example, anywhere that I want to set the color of an element,
+  I can instead set it to $contrastColor. When this is compiled into
+  pure css, it will simply replace $contrastColor everywhere in the
+  code with the color cornflowerblue. This can make it very easy for
+  me to replace the color throughout a massive stylesheet with only one
+  change.
+*/
 $contrastColor: cornflowerblue;
-$appWidth: 400px;
+$appWidth: 200px;
 
-
-// SASS also allows us to create functions that we can use to dynamically
-// calculate styles at build time.
+/*Sass also lets us define functions. These functions can be helpful for
+  precomputing values as we compile our sass to css. Because pure css
+  cannot execute functions like javascript can, the functions in sass
+  will be evaluated to static values at compile time.
+*/
 @function calcDivMargin($width) {
   @return $width / 4;
 }
 
-// Since SASS builds to css, we can write css as normal.
 html, body {
   height: 100%;
   width: 100%;
@@ -27,41 +48,33 @@ html, body {
   padding: 0; 
 }
 
-
-// The following #app styling displays how SASS allows us to nest related
-// elements within one another.
+/*Another thing sass lets us do is nest elements to better organize
+  our css code. For example, below we have the #app id. Then nested
+  inside we have a div. The css contained within would be equivalent
+  to if we defined #app div {} in regular css. In /hosted/main.css you
+  can see what this all compiles to.
+*/
 #app {
   width: 50%;
   margin: 0 auto;
   text-align: center; 
-  
-  // Because of it's nested nature, this div styling will only apply to divs
-  // contained within an element with an id of #app.
+
   div {
-    // Here we are setting margin-top to the value returned by our calcDivMargin
-    // function defined above. We are passing in our $appWidth variable as a
-    // parameter. It is worth noting that this function will not "dynamically"
-    // update as our page is running. When we run our SASS script, it will
-    // precompute this function value and store the resulting value as the 
-    // top margin size in /hosted/main.css
-    margin-top: calcDivMargin($appWidth);
-    
+    margin-top: calcDivMargin($appWidth); 
+
     h1 {
-      // Here we are setting our color to the value of our $contrastColor variable.
-      // This is useful, as we can edit the contrast color at the top of the file
-      // once and change it for everywhere that we make use of it in the file.
       color: $contrastColor; 
     }
-    
+
     h2 i {
       color: $contrastColor; 
     }
-    
+
     ul {
       width: $appWidth;
       margin: 0 auto;
       text-align: left; 
-      
+
       li {
         margin-top: 10px;
         word-break: break-all;

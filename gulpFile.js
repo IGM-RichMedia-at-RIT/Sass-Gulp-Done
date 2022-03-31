@@ -1,139 +1,149 @@
-// This file is used to define tasks that can be run by Gulp (https://gulpjs.com/)
-// Gulp is an automation/build pipeline tool that will allow us to define
-// complex tasks that can be run from the command line. Essentially gulp
-// will allow us to create a tasks similar to the ones we have been running
-// from the console out of package.json (npm test, npm run nodemon, etc).
-// However, it will allow us to chain these together, pass data between them,
-// and much more.
+/*Gulp (https://gulpjs.com/) is an automation tool that makes
+  the life of a developer far easier. Oftentimes developers have
+  a number of things they must do that are tedius and repetitive.
+  For example, running "npm test" and then "npm start" every time
+  we want to deploy our code. Or running "npm run webpack" every
+  time we want to bundle our client code.
 
-// Here we are importing the gulp package, as well as a number of plugins
-// that will be used in tandem with it. Many of them are libraries we have
-// seen many times before (eslint, babel, etc), but we need the version
-// specifically made to work with gulp.
+  Gulp allows us to turn these repetitive jobs into "tasks" that
+  it can run for us.
+*/
+
+/*Much like express, gulp is built to encorporate various plugins.
+  Many of these plugins are available on npm. Since each is made
+  by a different developer they all have their own syntax and
+  documentation that you'll need to follow. Below we import a number
+  of gulp-friendly versions of libraries we have used before such
+  as eslint, nodemon, webpack, etc. We also import the root gulp
+  library, and we import gulp-sass which will build our scss into
+  css. Note that we give it the dart-sass library to use for doing
+  the building.
+*/
 const gulp = require('gulp');
-const cache = require('gulp-cached');
-const babel = require('gulp-babel');
-const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('dart-sass'));
+const webpack = require('webpack-stream');
 const nodemon = require('gulp-nodemon');
-const eslint = require('gulp-eslint');
+const eslint = require('gulp-eslint-new');
+const webpackConfig = require('./webpack.config.js');
 
+/*Here is our first gulp task. Gulp tasks are defined as functions
+  and have one requirement. They must take in a callback function
+  (called "done" here), and they must call that callback at the end
+  of the task. This lets the gulp library know that our task has
+  completed.
 
-// Here we are defining a task to build our SCSS into browser ready css.
+  This task is meant to compile our sass into css. We start by using
+  the src function from the gulp library to load the file. gulp.src()
+  creates a "stream" object, which can be used to pass information
+  between consecutive function calls. So gulp.src() loads our file
+  into a stream. We then "pipe" that stream into the next function.
+
+  The next function, sass(), recieves our file from the gulp.src()
+  stream, and operates on that file. Due to the specifications of
+  the gulp-sass library, this will convert an .scss file to css.
+  The gulp-sass library also defines an on error handler.
+
+  The output from the sass() function is the compiled css based on
+  our main.scss file. We then pass or "pipe" that result into the
+  gulp.dest() function. That function takes in some content and writes
+  it to a given file. By default the file name will have the same
+  name as the input file. In this case 'main.scss' turns into 'main.css'
+  in the hosted folder.
+
+  Finally we let gulp know we are done with our task.
+*/
 const sassTask = (done) => {
-  // First, we have gulp retrieve the file we want to build.
-  gulp.src('./scss/main.scss')
-  // We will take this file and send it into a cache we have created called
-  // 'sass'. Once we do this, if the sassTask gets run again with no changes
-  // to the file, it will not rebuild it. This can save us a lot of cycles
-  // if there is a large number of files that we try to build.
-  .pipe(cache('sass'))
-  // We then use the pipe functionality to route the output of
-  // gulp.src into the sass() function. The sass() function will
-  // convert our .scss into .css. We also hook up the 'error' event
-  // handler, in case sass encounters an error trying to build.
-  .pipe(sass().on('error', sass.logError))
-  // Finally, we take the .css output by the sass() function and pipe
-  // that to gulp.dest, which writes a file out to a destination.
-  .pipe(gulp.dest('./hosted/'));
-  
-  
-  // Sometimes we might want to run this task on a separate thread. Gulp
-  // is happy to do that for us, but it needs us to tell it when the task
-  // is done so that it can close the thread. The easiest way is for it to
-  // give us a callback function as a parameter to call when we are done.
-  done();
+    gulp.src('./scss/main.scss')
+        .pipe(sass().on('error', sass.logError))
+        .pipe(gulp.dest('./hosted'));
+
+    done();
 };
 
-
-// The jsTask is going to transpile our client-side code using babel so
-// that it is compatible with most web browsers.
+/*Here we have another task whose job it is to run webpack based
+  on the specifications in our webpackConfig (imported above).
+  We could simply run "npm run webpack" to accomplish the same
+  results, but by putting it into a gulp task we can combine it
+  with other tasks.
+*/
 const jsTask = (done) => {
-  // Again, we begin by having gulp load in files for us to transpile.
-  // Here we can see that gulp is capable of loading in multiple files
-  // at once. Using the '*' character, we can tell it to grab every
-  // file inside of the client folder that has the .js extension. We
-  // will also tell it to grab every .jsx file.
-  gulp.src(['./client/*.js', './client/*.jsx'])
-  // Similar to the sass example above, we will send all the loaded files
-  // into a cache we have named 'babel'. If any file is unchanged, the
-  // rest of our task will not be run for that file, reducing build time.
-  .pipe(cache('babel'))
-  // We then send all of those files to babel using the pipe function.
-  // When setting up babel, we tell it which presets we want it to use,
-  // similar to our .babelrc file.
-  .pipe(babel({
-    presets: ['@babel/preset-env', '@babel/preset-react']
-  }))
-  // Once babel outputs transpiled javascript, we have gulp place it in
-  // the /hosted/ folder.
-  .pipe(gulp.dest('./hosted/'));
+    webpack(webpackConfig)
+        .pipe(gulp.dest('./hosted'));
+    
+    done();
+}
   
-  
-  // Finally, we alert gulp that we are done running our functionality
-  // by calling the done callback function.
-  done();
-};
-
-
-// Here we are defining a task that will run ESLint on our server code.
+/*Our third task will run eslint on our code. In sassTask above
+  we saw that gulp.src() can take in a single file. We can also
+  give it a pattern to match such as the one in lintTask. The 
+  pattern below tells gulp to load every .js file from any folder
+  inside the .js folder. It will then pass those files into the
+  eslint library which will function just like npm test.
+*/
 const lintTask = (done) => {
-  // We start by grabbing all the .js files in our server folder.
-  gulp.src(['./server/*.js'])
-  // We then send that through eslint, which will check for anywhere that
-  // we deviate from the styleguide. We will also send the 'fix' option to
-  // eslint, which will try to repair as many errors as it can automatically.
-  .pipe(eslint({fix: true}))
-  // eslint() outputs an unformatted report of our errors, so we will pipe
-  // that to the format function, which will make it human readable.
-  .pipe(eslint.format())
-  // We then tell eslint that if there is an error (where we didn't follow
-  // the style guide) then it should stop the rest of the task.
-  .pipe(eslint.failAfterError())
-  
-  // Finally, we tell gulp we are done running the task.
-  done();
+    gulp.src('./server/**/*.js')
+        .pipe(eslint({fix: true}))
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+    
+    done();
+}
+
+/*One major benefit of gulp is that because it is running node
+  under the hood, it can multithread our tasks. The gulp.parallel
+  function takes in any number of tasks and can run them on
+  separate threads simultaneously. This can seriously speed up
+  our tasks, especially if each of them takes a while.
+*/
+const build = gulp.parallel(sassTask, jsTask, lintTask);
+
+/*This watch task below is doing quite a lot. The gulp.watch()
+  function takes in a single file, folder, pattern, or array
+  of files/folders/patterns and observes them. When any of the
+  given files change, it will rerun the task given as the second
+  parameter.
+
+  For example, the first watch() call says that any time something
+  in our scss folder changes, the sassTask should be rerun.
+
+  The second watch statement says any time a .jsx or .js file in
+  the client folder changes, the jsTask should be run.
+
+  We will also use our watch task to run nodemon. The gulp-nodemon
+  library takes in a few options. The script option defines which
+  file should be run on restart (our app.js file). The tasks array
+  defines which tasks to run before restarting. Note that these tasks
+  need to be exported from our gulpFile to work properly. In this 
+  case, when our server code is about to restart, we will lint it first.
+
+  The watch option tells nodemon which folder to watch for changes.
+  Finally we also give it our done callback so that it properly tells
+  gulp when it has stopped watching our code.
+*/
+const watch = (done) => {
+    gulp.watch('./scss', sassTask);
+    gulp.watch(['./client/*.js', './client/*.jsx'], jsTask);
+    nodemon({ 
+        script: './server/app.js',
+        tasks: ['lintTask'],
+        watch: ['./server'],
+        done: done
+    });
+}
+
+/*From our gulpFile, we want to export any tasks that we want
+  to be able to call from our package.json or that we need to
+  be called by packages like gulp-nodemon. In this case we can
+  simply export all of them.
+
+  To call a gulp task from a package.json script, we simply
+  say "gulp [TASKNAME]". See examples of this in the package.json
+  in this project.
+*/
+module.exports = {
+	sassTask,
+    build,
+    jsTask,
+    lintTask,
+    watch
 };
-
-// To make gulp tasks accessible from the command line, we need to export them
-// from this gulpFile.js. In this case, rather than exporting each task alone,
-// we can create a "build" script that can run them all. Since none of them are
-// reliant on each other, we can have them all run in parallel. After exporting
-// this, we can write a script like our "build" script in package.json.
-module.exports.build = gulp.parallel(sassTask, jsTask, lintTask);
-
-
-// We can also use our above tasks in a watch script. Just like our previous
-// watch scripts, a "watch" will watch a file and do something if it changes.
-// Because gulp can start up threads, we can have multiple watches running at
-// the same time from the same commandline window.
-const watch = () => {
-  // First, we tell gulp to watch our main.scss file, and rerun our sass task
-  // whenever there is a change to that file.
-  gulp.watch('./scss/main.scss', sassTask);
-  
-  // We also want it to watch our client side javascript, and if there are any
-  // changes, we want it to run the jsTask from above.
-  gulp.watch(['./client/*.js', './client/*.jsx'], jsTask);
-  
-  // Finally, we want to start up nodemon to restart whenever our code changes.
-  // Nodemon will watch EVERY file in our project, and will restart our 'script'
-  // file when there is a change detected.
-  // We don't want it to watch our client/, scss/, or node_modules/ folder. The
-  // reason for this being that our above watch scripts are already watching these
-  // files, and when a change happens in one of them it will build to the hosted
-  // folder. Nodemon will then notice these changes to the hosted folder and will
-  // restart. If we didn't ignore them, it would restart at least twice for each
-  // change made. We want to ignore node_modules/ as it is a lot of extra files to
-  // watch, and it shouldn't change if we are programming anyways.
-  // Finally we tell it to only watch files with the js, html, or css file extension.
-  nodemon({
-    script: './server/app.js',
-    ignore: ['client/', 'scss/', 'node_modules/'],
-    ext: 'js html css'
-  });
-};
-
-
-// We then export the watch function so that gulp can use it from the command line.
-// Take a look at the watch script in package.json to see how that works.
-module.exports.watch = watch;
