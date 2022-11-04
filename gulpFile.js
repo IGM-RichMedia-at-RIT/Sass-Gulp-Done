@@ -20,7 +20,7 @@
   the building.
 */
 const gulp = require('gulp');
-const sass = require('gulp-sass')(require('dart-sass'));
+const sass = require('gulp-sass')(require('sass'));
 const webpack = require('webpack-stream');
 const nodemon = require('gulp-nodemon');
 const eslint = require('gulp-eslint-new');

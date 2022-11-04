@@ -38,7 +38,7 @@ $appWidth: 200px;
   will be evaluated to static values at compile time.
 */
 @function calcDivMargin($width) {
-  @return $width / 4;
+  @return calc($width / 4);
 }
 
 html, body {
