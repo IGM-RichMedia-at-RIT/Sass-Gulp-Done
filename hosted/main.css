@@ -1,7 +1,3 @@
-body {
-  background-color: orange;
-}
-
 /*This file is written with "Sass", a superset language of css
   that adds / extends the base css functionality. It will not
   run in the browser, so it will need to be compiled to raw css.
@@ -21,6 +17,10 @@ body {
   bundle. In this case, we are importing the contents of other.scss
   into this file.
 */
+body {
+  background-color: orange;
+}
+
 /*With sass we can also define variables like the two below. We can
   then use these variables in place of where we might use their values.
   For example, anywhere that I want to set the color of an element,

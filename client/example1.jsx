@@ -3,7 +3,7 @@
 const HelloWorld = () => {
   return (
       <div>
-          Hello World!!
+          Hello World!
       </div>
   );
 };
