@@ -1,5 +1,6 @@
 //JSX to be built by webpack. See React Functional Component demo.
-
+const React = require('react');
+const {createRoot} = require('react-dom/client');
 const { useState, useEffect } = React;
 
 const SongContainer = (props) => {
@@ -36,10 +37,8 @@ const SongContainer = (props) => {
 }
 
 const init = () => {
-    ReactDOM.render(
-        <SongContainer songs={[]} />,
-        document.getElementById('app')
-    );
+    const root = createRoot(document.getElementById('app'));
+    root.render(<SongContainer songs={[]} />);
 }
 
 window.onload = init;
