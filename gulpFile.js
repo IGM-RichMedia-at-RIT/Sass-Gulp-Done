@@ -96,6 +96,7 @@ const lintTask = (done) => {
   our tasks, especially if each of them takes a while.
 */
 const build = gulp.parallel(sassTask, jsTask, lintTask);
+const herokuBuild = gulp.parallel(sassTask, jsTask);
 
 /*This watch task below is doing quite a lot. The gulp.watch()
   function takes in a single file, folder, pattern, or array
@@ -145,5 +146,6 @@ module.exports = {
     build,
     jsTask,
     lintTask,
-    watch
+    watch,
+    herokuBuild,
 };
