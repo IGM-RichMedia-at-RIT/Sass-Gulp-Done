@@ -18,7 +18,7 @@
   into this file.
 */
 body {
-  background-color: orange;
+  background-color: green;
 }
 
 /*With sass we can also define variables like the two below. We can

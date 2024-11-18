@@ -1,4 +1,4 @@
-// import libraries 
+// import libraries
 const path = require('path');
 const express = require('express');
 const compression = require('compression');
